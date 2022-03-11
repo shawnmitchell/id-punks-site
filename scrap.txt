@@ -1,0 +1,165 @@
+SET UP A LOCAL NETWORK
+
+curl -X POST -k http://localhost:8081/v1/control/start \
+-d '{"execPath":"/Users/shawnmitchell/projects/go/src/github.com/ava-labs/avalanchego/build/avalanchego","logLevel":"INFO"}'
+
+CREATE A KEYSTORE USER
+
+curl -X POST --data '{
+    "jsonrpc":"2.0",
+    "id"     :1,
+    "method" :"keystore.createUser",
+    "params" :{
+        "username":"H4x0rRaza",
+        "password":"^Super*passw0rd%"
+    }
+}' -H 'content-type:application/json;' 127.0.0.1:38214/ext/keystore
+
+CONFIRM KEYSTORE
+
+curl -X POST --data '{
+    "jsonrpc":"2.0",
+    "id"     :1,
+    "method" :"keystore.listUsers"
+}' -H 'content-type:application/json;' 127.0.0.1:38214/ext/keystore
+
+FUND KEYSTORE USER
+
+curl --location --request POST 'localhost:38214/ext/platform' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "jsonrpc": "2.0",
+    "method": "platform.importKey",
+    "params":{
+        "username":"H4x0rRaza",
+        "password":"^Super*passw0rd%",
+          "privateKey":"PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
+    },
+    "id": 1
+}'
+
+CREATE SUBNET
+
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "platform.createAddress",
+    "params": {
+        "username":"H4x0rRaza",
+        "password":"^Super*passw0rd%"
+    },
+    "id": 1
+}' -H 'content-type:application/json;' 127.0.0.1:38214/ext/P
+
+ADDRESSES 
+
+{"jsonrpc":"2.0","result":{"address":"P-custom1dr20fdlct8sh59r4mxmmarehrah6vj5l2cqg3x"},"id":1}
+{"jsonrpc":"2.0","result":{"address":"P-custom1t6nacq3efstx5slxysvk3zs58rj64sltg26c5e"},"id":1}
+
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "platform.createSubnet",
+    "params": {
+        "controlKeys":[
+            "P-custom1dr20fdlct8sh59r4mxmmarehrah6vj5l2cqg3x",
+            "P-custom1t6nacq3efstx5slxysvk3zs58rj64sltg26c5e"
+        ],
+        "threshold":2,
+        "username":"H4x0rRaza",
+        "password":"^Super*passw0rd%"
+    },
+    "id": 1
+}' -H 'content-type:application/json;' 127.0.0.1:38214/ext/P
+
+CHANGE ADDRESS
+
+{
+  "jsonrpc":"2.0","result":
+  {
+    "txID":"2NCLFedFWpQjJ5XuBc1hDTDBkHoQSsRXgD7ca8Aw335Wex9N4E",
+    "changeAddr":"P-custom18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p"
+  },
+  "id":1
+}
+
+CONFIRM SUBNET
+
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "platform.getSubnets",
+    "params": {},
+    "id": 1
+}' -H 'content-type:application/json;' 127.0.0.1:38214/ext/P
+
+{"jsonrpc":"2.0","result":{"subnets":[{"id":"2NCLFedFWpQjJ5XuBc1hDTDBkHoQSsRXgD7ca8Aw335Wex9N4E","controlKeys":["P-custom1t6nacq3efstx5slxysvk3zs58rj64sltg26c5e","P-custom1dr20fdlct8sh59r4mxmmarehrah6vj5l2cqg3x"],"threshold":"2"},{"id":"11111111111111111111111111111111LpoYY","controlKeys":[],"threshold":"0"}]},"id":1}
+
+ADD VALIDATOR NODE TO SUBNET
+
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "platform.addSubnetValidator",
+    "params": {
+        "nodeID":"NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg",
+        "subnetID":"2NCLFedFWpQjJ5XuBc1hDTDBkHoQSsRXgD7ca8Aw335Wex9N4E",
+        "startTime":1646955441,
+        "endTime":1649547290,
+        "weight":30,
+        "changeAddr": "P-custom18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p",
+        "username":"H4x0rRaza",
+        "password":"^Super*passw0rd%"
+    },
+    "id": 1
+}' -H 'content-type:application/json;' 127.0.0.1:38214/ext/P
+
+
+
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "platform.getSubnets",
+    "params": {"ids":["2NCLFedFWpQjJ5XuBc1hDTDBkHoQSsRXgD7ca8Aw335Wex9N4E"]},
+    "id": 1
+}' -H 'content-type:application/json;' 127.0.0.1:38214/ext/P
+
+{
+  "jsonrpc":"2.0",
+  "result":{
+    "subnets":[
+      {
+        "id":"2NCLFedFWpQjJ5XuBc1hDTDBkHoQSsRXgD7ca8Aw335Wex9N4E",
+        "controlKeys":[
+          "P-custom1t6nacq3efstx5slxysvk3zs58rj64sltg26c5e",
+          "P-custom1dr20fdlct8sh59r4mxmmarehrah6vj5l2cqg3x"
+        ],
+        "threshold":"2"
+      }
+    ]
+  },
+  "id":1
+}
+
+WHITELIST NODE
+
+avalanche-network-runner control restart-node \
+--request-timeout=3m \
+--log-level debug \
+--endpoint="0.0.0.0:8080" \
+--node-name node1 \
+--avalanchego-path /Users/shawnmitchell/projects/go/src/github.com/ava-labs/avalanchego/build/avalanchego \
+--whitelisted-subnets="2NCLFedFWpQjJ5XuBc1hDTDBkHoQSsRXgD7ca8Aw335Wex9N4E"
+
+node5: node ID "NodeID-P7oB2McjBGgW2NXXWVYjV8JEDFoW9xDE5", URI "http://localhost:43289"
+node1: node ID "NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg", URI "http://localhost:12906"
+node2: node ID "NodeID-MFrZFVCXPv5iCn6M9K6XduxGTYp891xXZ", URI "http://localhost:39605"
+node3: node ID "NodeID-NFBbbJ4qCmNaCzeW7sxErhvWqvEQMnYcN", URI "http://localhost:57473"
+node4: node ID "NodeID-GWPcbFJZFfZreETSoWjPimr846mXEKCtu", URI "http://localhost:12047"
+
+curl -X POST --data '{
+    "jsonrpc":"2.0",
+    "id"     :1,
+    "method" :"keystore.listUsers"
+}' -H 'content-type:application/json;' 127.0.0.1:12906/ext/keystore
+
+curl -X POST --data '{
+    "jsonrpc":"2.0",
+    "id"     :1,                       
+    "method" :"info.peers"
+}' -H 'content-type:application/json;' 127.0.0.1:12047/ext/info
