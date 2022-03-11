@@ -1,7 +1,16 @@
 import React, {useState, useEffect} from 'react';
 import { FormControl, FormControlLabel, FormLabel, RadioGroup, Radio } from '@material-ui/core';
 import mergeImages from 'merge-images';
+import {ethers} from 'ethers';
 import './App.css';
+import { API } from 'aws-amplify';
+import RealIDPunks from './contracts/RealIDPunks.json';
+import Selfie from './selfie.jpg';
+import { WebcamCapture } from './components/webcam';
+
+const CONTRACT_ADDRESS = "0xF2Ec1cF88e39a37eBd40250D33a024f98d760fEf";
+
+
 
 interface ColorChipProps {
   color: string;
@@ -24,7 +33,35 @@ function App() {
   const [mouth, setMouth] = useState<string>('./assets/mouths/stoic.png');
   const [jewelry, setJewelry] = useState<string>('./assets/hair/short/bald.png');
   const [accessory, setAccessory] = useState<string>('./assets/hair/short/bald.png');
+  const [selfie, setSelfie] = useState<string>();
+  const [showCamera, setShowCamera] = useState<boolean>(false);
+  const [walletAddress, setWalletAddress] = useState<string>();
+  const [fetching, setFetching] = useState<boolean>(false);
 
+  useEffect(() => {
+    
+    (async() => {
+      // @ts-ignore
+      const {ethereum} = window;
+      if (!!ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const _signer = provider.getSigner();
+        const accounts = await ethereum.request({ method: 'eth_accounts' });
+        setWalletAddress(accounts[0]);
+        let chainId = await ethereum.request({ method: 'eth_chainId' });
+        console.log("Connected to chain " + chainId);
+        const punks = new ethers.Contract(CONTRACT_ADDRESS, RealIDPunks.abi, _signer);
+        // const result = await punks.
+        punks.on('Transfer', (event) => {
+          console.log(event);
+        })
+
+        return () => punks.off('Transfer', () => {});
+      }
+      
+
+    })();
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -56,8 +93,55 @@ function App() {
     })();
   }, [background, eyes, skintone, mouth, jewelry, accessory, hairLength, hairColor, sweatband])
 
+  const takeSelfie = () => {
+    setShowCamera(true);
+  }
+
+  const handleCapture = (imgSrc: string) => {
+    setSelfie(imgSrc);
+    setShowCamera(false);
+  }
+
+  const submit = async () => {
+    const result = await API.post('mintPunk', '/', {
+      body: {
+        address: walletAddress,
+        proofs: [],
+        selfie: selfie?.split(',')[1]
+        }
+    })
+    console.log(result);
+  }
+
+  const handlePaste = async () => {
+    const payload = await navigator.clipboard.readText();
+    console.log(payload);
+  }
+
   return (
     <div className="App">
+      <div className="SelfieGroup">
+        { showCamera ? (<WebcamCapture onCapture={handleCapture} />) : (
+        <>
+          {!!selfie ? (
+          <>  
+            <img src={selfie} alt='none' className="Selfie" />
+            <button onClick={submit}>Submit</button>
+            <button onClick={takeSelfie}>Retake Selfie</button>
+          </>
+          ) : (
+            <button onClick={takeSelfie}>Take Selfie</button>
+          )}
+        </>
+        ) }
+        {!!fetching ? (
+          <button onClick={handlePaste}>Paste Data Here</button>
+        ) : (
+          <a href='https://master.d1pxugyx19c9zm.amplifyapp.com/?request=[EyeColor,HairColor]' target="_blank" rel="noreferrer noopener">
+            <button onClick={() => setFetching(true)}>Share Eye & Hair Color</button>
+          </a> 
+        )}
+      </div>
       {!!img && (
         <img alt='oops' src={img} height='400px' style={{margin: '4px'}} />
       )}

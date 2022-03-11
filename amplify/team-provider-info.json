@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-idpunkssite-dev-132523-authRole",
+      "UnauthRoleArn": "arn:aws:iam::953169169434:role/amplify-idpunkssite-dev-132523-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::953169169434:role/amplify-idpunkssite-dev-132523-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-idpunkssite-dev-132523-deployment",
+      "UnauthRoleName": "amplify-idpunkssite-dev-132523-unauthRole",
+      "StackName": "amplify-idpunkssite-dev-132523",
+      "StackId": "arn:aws:cloudformation:us-east-1:953169169434:stack/amplify-idpunkssite-dev-132523/4b95a9c0-9fd6-11ec-87be-12e2ef6e7d3d",
+      "AmplifyAppId": "d23fn1opnf2lvd"
+    },
+    "categories": {
+      "function": {
+        "mintPunk": {
+          "deploymentBucketName": "amplify-idpunkssite-dev-132523-deployment",
+          "s3Key": "amplify-builds/mintPunk-354c734b5a4534546576-build.zip"
+        }
+      }
+    }
+  }
+}
