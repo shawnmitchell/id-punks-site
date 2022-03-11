@@ -26,6 +26,7 @@ export const WebcamCapture = (props: WebcamCaptureProps) => {
   return (
     <>
       <Webcam
+        style={{borderRadius: '50%'}}
         audio={false}
         height={videoConstraints.height}
         ref={webcamRef}

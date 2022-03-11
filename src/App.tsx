@@ -110,7 +110,7 @@ function App() {
         selfie: selfie?.split(',')[1]
         }
     })
-    console.log(result);
+    console.log(result.result.attributes);
   }
 
   const handlePaste = async () => {
@@ -137,7 +137,7 @@ function App() {
         {!!fetching ? (
           <button onClick={handlePaste}>Paste Data Here</button>
         ) : (
-          <a href='https://master.d1pxugyx19c9zm.amplifyapp.com/?request=[EyeColor,HairColor]' target="_blank" rel="noreferrer noopener">
+          <a href='https://master.d1pxugyx19c9zm.amplifyapp.com/?request=[FacialHair,GeographicOrigin,Sex,Emotion,EyeColor,HairColor]' target="_blank" rel="noreferrer noopener">
             <button onClick={() => setFetching(true)}>Share Eye & Hair Color</button>
           </a> 
         )}
@@ -160,9 +160,13 @@ function App() {
       <FormControl component="fieldset" style={{margin: '4px'}}>
         <FormLabel component="legend">Background</FormLabel>
         <RadioGroup aria-label="background" name="background" value={background} onChange={(_, val) => setBackground(val)}>
-          <FormControlLabel value='./assets/backgrounds/blue.png' control={<Radio />} label="Blue" />
+          <FormControlLabel value='./assets/backgrounds/blue-sky.png' control={<Radio />} label="BlueSky" />
           <FormControlLabel value='./assets/backgrounds/gray.png' control={<Radio />} label="Gray" />
           <FormControlLabel value='./assets/backgrounds/green.png' control={<Radio />} label="Green" />
+          <FormControlLabel value='./assets/backgrounds/blue.png' control={<Radio />} label="Blue" />
+          <FormControlLabel value='./assets/backgrounds/orange.png' control={<Radio />} label="Orange" />
+          <FormControlLabel value='./assets/backgrounds/pink.png' control={<Radio />} label="Pink" />
+          <FormControlLabel value='./assets/backgrounds/purple.png' control={<Radio />} label="Purple" />
         </RadioGroup>
       </FormControl>
       <FormControl component="fieldset" style={{margin: '4px'}}>
