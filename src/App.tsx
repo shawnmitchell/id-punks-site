@@ -5,12 +5,16 @@ import {ethers} from 'ethers';
 import './App.css';
 import { API } from 'aws-amplify';
 import RealIDPunks from './contracts/RealIDPunks.json';
-import Selfie from './selfie.jpg';
 import { WebcamCapture } from './components/webcam';
 
 const CONTRACT_ADDRESS = "0xF2Ec1cF88e39a37eBd40250D33a024f98d760fEf";
 
-
+interface Proof {
+  index: number;
+  key: string;
+  value: string;
+  proof: string[];
+}
 
 interface ColorChipProps {
   color: string;
@@ -27,12 +31,13 @@ function App() {
   const [background, setBackground] = useState<string>('./assets/backgrounds/blue.png');
   const [eyes, setEyes] = useState<string>('./assets/eyes/blue.png');
   const [hairLength, setHairLength] = useState<'short' | 'long'>('short');
-  const [hairColor, setHairColor] = useState<'bald' | 'black' | 'blonde' | 'brown' | 'gray' | 'pink' | 'red' | 'jeff'>('bald');
+  const [hairColor, setHairColor] = useState<string>('bald');
   const [sweatband, setSweatband] = useState<'none' | 'Blue' | 'Green' | 'Red'>('none');
   const [skintone, setSkintone] = useState<string>('./assets/skintones/brown.png');
   const [mouth, setMouth] = useState<string>('./assets/mouths/stoic.png');
   const [jewelry, setJewelry] = useState<string>('./assets/hair/short/bald.png');
   const [accessory, setAccessory] = useState<string>('./assets/hair/short/bald.png');
+  const [facialHair, setFacialHair] = useState<string>('./assets/hair/short/bald.png');
   const [selfie, setSelfie] = useState<string>();
   const [showCamera, setShowCamera] = useState<boolean>(false);
   const [walletAddress, setWalletAddress] = useState<string>();
@@ -81,6 +86,7 @@ function App() {
           './assets/nose.png', 
           eyes, 
           hair,
+          facialHair,
           headband,
           jewelry,
           accessory,
@@ -91,7 +97,7 @@ function App() {
         console.log(error);
       }
     })();
-  }, [background, eyes, skintone, mouth, jewelry, accessory, hairLength, hairColor, sweatband])
+  }, [background, eyes, skintone, mouth, jewelry, accessory, facialHair, hairLength, hairColor, sweatband])
 
   const takeSelfie = () => {
     setShowCamera(true);
@@ -114,8 +120,64 @@ function App() {
   }
 
   const handlePaste = async () => {
-    const payload = await navigator.clipboard.readText();
-    console.log(payload);
+    try {
+      const payload = await navigator.clipboard.readText();
+      const parsed = JSON.parse(payload);
+      console.log(parsed);
+      const gender = parsed.find((item: Proof) => item.key === 'Sex');
+      setHairLength(gender.value === 'M' ? 'short' : 'long');
+      parsed.forEach((p: Proof) => {
+        const {key, value, index, proof} = p;
+
+        switch (key) {
+          case 'EyeColor':
+            setEyes(`./assets/eyes/${value.toLowerCase()}.png`);
+            break;
+          case 'HairColor':
+            setHairColor(value.toLowerCase());
+            break;
+          case 'GeographicOrigin': 
+            switch (value) {
+              case 'EUROPEAN':
+                setSkintone('./assets/skintones/pink.png');
+                break;
+                case 'EASTASIAN':
+                  setSkintone('./assets/skintones/asian.png');
+                  break;
+                case 'SOUTHASIAN':
+                  setSkintone('./assets/skintones/tan.png');
+                  break;
+                case 'AFRICAN':
+                  setSkintone('./assets/skintones/brown.png');
+                  break;
+                default:
+                  break;
+              }
+            break;
+          case 'Emotion':
+            switch(value) {
+              case 'JOY':
+                setMouth(gender.value === 'M' ? './assets/mouths/happy.png' : './assets/mouths/SmirkLipstickMouth.png');
+                break;
+              case 'Sadness':
+                setMouth(gender.value === 'M' ? './assets/mouths/mad.png' : './assets/mouths/BoredLipstickMouth.png');
+                break;
+              default:
+                setMouth(gender.value === 'M' ? './assets/mouths/stoic.png' : './assets/mouths/NormalLipstickMouth.png')
+                break;
+            }
+            break;
+          case 'FacialHair': 
+            setFacialHair(value === '0' ? './assets/hair/short/bald.png' : './assets/beard.png')
+            break;
+          default:
+            console.log(key, value);
+            break;
+        }
+      })
+    } catch(error) {
+      console.log(error);
+    }
   }
 
   return (
