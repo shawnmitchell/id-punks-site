@@ -28,20 +28,22 @@ const ColorChip = ({color}: ColorChipProps) => {
 
 function App() {
   const [img, setImg] = useState<string>();
-  const [background, setBackground] = useState<string>('./assets/backgrounds/blue.png');
-  const [eyes, setEyes] = useState<string>('./assets/eyes/blue.png');
+  const [background, setBackground] = useState<string>('./assets_two/backgrounds/blue.png');
+  const [eyes, setEyes] = useState<string>('./assets_two/eyes/blue.png');
   const [hairLength, setHairLength] = useState<'short' | 'long'>('short');
-  const [hairColor, setHairColor] = useState<string>('bald');
-  const [sweatband, setSweatband] = useState<'none' | 'Blue' | 'Green' | 'Red'>('none');
-  const [skintone, setSkintone] = useState<string>('./assets/skintones/brown.png');
-  const [mouth, setMouth] = useState<string>('./assets/mouths/stoic.png');
-  const [jewelry, setJewelry] = useState<string>('./assets/hair/short/bald.png');
-  const [accessory, setAccessory] = useState<string>('./assets/hair/short/bald.png');
-  const [facialHair, setFacialHair] = useState<string>('./assets/hair/short/bald.png');
+  const [hairColor, setHairColor] = useState<string>('Bald');
+  const [sweatband, setSweatband] = useState<string>('none');
+  const [skintone, setSkintone] = useState<string>('./assets_two/skintones/brown.png');
+  const [mouth, setMouth] = useState<string>('./assets_two/mouths/NormalMouth.png');
+  const [jewelry, setJewelry] = useState<string>('./assets_two/hair/short/Bald.png');
+  const [accessory, setAccessory] = useState<string>('./assets_two/hair/short/Bald.png');
+  const [facialHair, setFacialHair] = useState<string>('./assets_two/hair/short/Bald.png');
   const [selfie, setSelfie] = useState<string>();
   const [showCamera, setShowCamera] = useState<boolean>(false);
   const [walletAddress, setWalletAddress] = useState<string>();
+  const [eyewear, setEyewear] = useState<string>('./assets_two/hair/short/Bald.png');
   const [fetching, setFetching] = useState<boolean>(false);
+  const [proofs, setProofs] = useState<Proof[]>([]);
 
   useEffect(() => {
     
@@ -73,21 +75,22 @@ function App() {
       console.log(window.location.href);
       console.log(sweatband);
       console.log(hairLength);
-      const hair = `./assets/hair/${hairLength}/${hairColor}.png`;
-      const headband = sweatband === 'none' ? './assets/hair/short/bald.png' : `./assets/hats/${hairLength === 'long' && hairColor !== 'bald' ? 'LongHair' : ''}${sweatband}Sweatband.png`;
+      const hair = `./assets_two/hair/${hairLength}/${hairColor}.png`;
+      const headband = sweatband === 'none' ? './assets_two/hair/short/Bald.png' : `./assets_two/hats/${hairLength === 'long' && hairColor !== 'bald' ? 'LongHair' : ''}${sweatband}Sweatband.png`;
       console.log(headband);
       try {
         // ORDER MATTERS HERE - from back to front please
         const result = await mergeImages([
           background, 
-          './assets/outline.png', 
           skintone, 
+          './assets_two/PunkBaseGirl.png', 
           mouth, 
-          './assets/nose.png', 
+          './assets_two/nose.png', 
           eyes, 
           hair,
           facialHair,
           headband,
+          eyewear,
           jewelry,
           accessory,
         ]);
@@ -97,8 +100,11 @@ function App() {
         console.log(error);
       }
     })();
-  }, [background, eyes, skintone, mouth, jewelry, accessory, facialHair, hairLength, hairColor, sweatband])
+  }, [background, eyes, skintone, mouth, jewelry, accessory, eyewear, facialHair, hairLength, hairColor, sweatband])
 
+
+
+  
   const takeSelfie = () => {
     setShowCamera(true);
   }
@@ -112,11 +118,11 @@ function App() {
     const result = await API.post('mintPunk', '/', {
       body: {
         address: walletAddress,
-        proofs: [],
+        proofs,
         selfie: selfie?.split(',')[1]
         }
     })
-    console.log(result.result.attributes);
+    console.log(result);
   }
 
   const handlePaste = async () => {
@@ -131,7 +137,7 @@ function App() {
 
         switch (key) {
           case 'EyeColor':
-            setEyes(`./assets/eyes/${value.toLowerCase()}.png`);
+            setEyes(`./assets_two/eyes/${value.toLowerCase()}.png`);
             break;
           case 'HairColor':
             setHairColor(value.toLowerCase());
@@ -139,16 +145,16 @@ function App() {
           case 'GeographicOrigin': 
             switch (value) {
               case 'EUROPEAN':
-                setSkintone('./assets/skintones/pink.png');
+                setSkintone('./assets_two/skintones/pink.png');
                 break;
                 case 'EASTASIAN':
-                  setSkintone('./assets/skintones/asian.png');
+                  setSkintone('./assets_two/skintones/asian.png');
                   break;
                 case 'SOUTHASIAN':
-                  setSkintone('./assets/skintones/tan.png');
+                  setSkintone('./assets_two/skintones/tan.png');
                   break;
                 case 'AFRICAN':
-                  setSkintone('./assets/skintones/brown.png');
+                  setSkintone('./assets_two/skintones/brown.png');
                   break;
                 default:
                   break;
@@ -157,18 +163,18 @@ function App() {
           case 'Emotion':
             switch(value) {
               case 'JOY':
-                setMouth(gender.value === 'M' ? './assets/mouths/happy.png' : './assets/mouths/SmirkLipstickMouth.png');
+                setMouth(gender.value === 'M' ? './assets_two/mouths/happy.png' : './assets_two/mouths/SmirkLipstickMouth.png');
                 break;
               case 'Sadness':
-                setMouth(gender.value === 'M' ? './assets/mouths/mad.png' : './assets/mouths/BoredLipstickMouth.png');
+                setMouth(gender.value === 'M' ? './assets_two/mouths/mad.png' : './assets_two/mouths/BoredLipstickMouth.png');
                 break;
               default:
-                setMouth(gender.value === 'M' ? './assets/mouths/stoic.png' : './assets/mouths/NormalLipstickMouth.png')
+                setMouth(gender.value === 'M' ? './assets_two/mouths/stoic.png' : './assets_two/mouths/NormalLipstickMouth.png')
                 break;
             }
             break;
           case 'FacialHair': 
-            setFacialHair(value === '0' ? './assets/hair/short/bald.png' : './assets/beard.png')
+            setFacialHair(value === '0' ? './assets_two/hair/short/Bald.png' : './assets_two/beard.png')
             break;
           default:
             console.log(key, value);
@@ -211,35 +217,44 @@ function App() {
       <FormControl component="fieldset" style={{margin: '4px'}}>
         <FormLabel component="legend">Skin Tone</FormLabel>
         <RadioGroup aria-label="skin tone" name="skintone" value={skintone} onChange={(_, val) => setSkintone(val)}>
-          <FormControlLabel value='./assets/skintones/pink.png' control={<Radio />} label={<ColorChip color='#FFCDD2' />} />
-          <FormControlLabel value='./assets/skintones/asian.png' control={<Radio />} label={<ColorChip color='#E3CAB1' />} />
-          <FormControlLabel value='./assets/skintones/tan.png' control={<Radio />} label={<ColorChip color='#CFA890' />} />
-          <FormControlLabel value='./assets/skintones/brown.png' control={<Radio />} label={<ColorChip color='#5C4036' />} />
-          <FormControlLabel value='./assets/skintones/alien.png' control={<Radio />} label={<ColorChip color='#F0BBFA' />} />
-          <FormControlLabel value='./assets/skintones/zombie.png' control={<Radio />} label={<ColorChip color='#FC6868' />} />
+          <FormControlLabel value='./assets_two/skintones/pink.png' control={<Radio />} label={<ColorChip color='#FFCDD2' />} />
+          <FormControlLabel value='./assets_two/skintones/asian.png' control={<Radio />} label={<ColorChip color='#E3CAB1' />} />
+          <FormControlLabel value='./assets_two/skintones/tan.png' control={<Radio />} label={<ColorChip color='#CFA890' />} />
+          <FormControlLabel value='./assets_two/skintones/brown.png' control={<Radio />} label={<ColorChip color='#5C4036' />} />
+          <FormControlLabel value='./assets_two/skintones/alien.png' control={<Radio />} label={<ColorChip color='#F0BBFA' />} />
+          <FormControlLabel value='./assets_two/skintones/zombie.png' control={<Radio />} label={<ColorChip color='#FC6868' />} />
         </RadioGroup>
       </FormControl>
       <FormControl component="fieldset" style={{margin: '4px'}}>
         <FormLabel component="legend">Background</FormLabel>
         <RadioGroup aria-label="background" name="background" value={background} onChange={(_, val) => setBackground(val)}>
-          <FormControlLabel value='./assets/backgrounds/blue-sky.png' control={<Radio />} label="BlueSky" />
-          <FormControlLabel value='./assets/backgrounds/gray.png' control={<Radio />} label="Gray" />
-          <FormControlLabel value='./assets/backgrounds/green.png' control={<Radio />} label="Green" />
-          <FormControlLabel value='./assets/backgrounds/blue.png' control={<Radio />} label="Blue" />
-          <FormControlLabel value='./assets/backgrounds/orange.png' control={<Radio />} label="Orange" />
-          <FormControlLabel value='./assets/backgrounds/pink.png' control={<Radio />} label="Pink" />
-          <FormControlLabel value='./assets/backgrounds/purple.png' control={<Radio />} label="Purple" />
+          <FormControlLabel value='./assets_two/backgrounds/BlueSky.png' control={<Radio />} label="BlueSky" />
+          <FormControlLabel value='./assets_two/backgrounds/Gray.png' control={<Radio />} label="Gray" />
+          <FormControlLabel value='./assets_two/backgrounds/Green.png' control={<Radio />} label="Green" />
+          <FormControlLabel value='./assets_two/backgrounds/Blue.png' control={<Radio />} label="Blue" />
+          <FormControlLabel value='./assets_two/backgrounds/Orange.png' control={<Radio />} label="Orange" />
+          <FormControlLabel value='./assets_two/backgrounds/Pink.png' control={<Radio />} label="Pink" />
+          <FormControlLabel value='./assets_two/backgrounds/Purple.png' control={<Radio />} label="Purple" />
+          <FormControlLabel value='./assets_two/backgrounds/StarryNight.png' control={<Radio />} label="Starry Night" />
+          <FormControlLabel value='./assets_two/backgrounds/Wordle.png' control={<Radio />} label="Wordle" />
+          <FormControlLabel value='./assets_two/backgrounds/BackgroundUkraine.png' control={<Radio />} label="Ukraine" />
+          <FormControlLabel value='./assets_two/backgrounds/Sunrise.png' control={<Radio />} label="Sunrise" />
+          <FormControlLabel value='./assets_two/backgrounds/Sunset.png' control={<Radio />} label="Sunset" />
+          <FormControlLabel value='./assets_two/backgrounds/Alps.png' control={<Radio />} label="Alps" />
+          <FormControlLabel value='./assets_two/backgrounds/Crazy.png' control={<Radio />} label="Crazy" />
+          <FormControlLabel value='./assets_two/backgrounds/Rainbow.png' control={<Radio />} label="Rainbow" />
+          <FormControlLabel value='./assets_two/backgrounds/Night.png' control={<Radio />} label="Night" />
         </RadioGroup>
       </FormControl>
       <FormControl component="fieldset" style={{margin: '4px'}}>
         <FormLabel component="legend">Eye Color</FormLabel>
         <RadioGroup aria-label="eye color" name="skintone" value={eyes} onChange={(_, val) => setEyes(val)}>
-          <FormControlLabel value='./assets/eyes/blue.png' control={<Radio />} label="Blue" />
-          <FormControlLabel value='./assets/eyes/gray.png' control={<Radio />} label="Gray" />
-          <FormControlLabel value='./assets/eyes/brown.png' control={<Radio />} label="Brown" />
-          <FormControlLabel value='./assets/eyes/hazel.png' control={<Radio />} label="Hazel" />
-          <FormControlLabel value='./assets/eyes/green.png' control={<Radio />} label="Green" />
-          <FormControlLabel value='./assets/eyes/zombie.png' control={<Radio />} label="Zombie" />
+          <FormControlLabel value='./assets_two/eyes/blue.png' control={<Radio />} label="Blue" />
+          <FormControlLabel value='./assets_two/eyes/gray.png' control={<Radio />} label="Gray" />
+          <FormControlLabel value='./assets_two/eyes/brown.png' control={<Radio />} label="Brown" />
+          <FormControlLabel value='./assets_two/eyes/hazel.png' control={<Radio />} label="Hazel" />
+          <FormControlLabel value='./assets_two/eyes/green.png' control={<Radio />} label="Green" />
+          <FormControlLabel value='./assets_two/eyes/zombie.png' control={<Radio />} label="Zombie" />
         </RadioGroup>
       </FormControl>
       <FormControl component="fieldset" style={{margin: '4px'}}>
@@ -248,13 +263,14 @@ function App() {
             // @ts-ignore
             setHairColor(val);
           }}>
-          <FormControlLabel value='bald' control={<Radio />} label="None" />
-          <FormControlLabel value='gray' control={<Radio />} label="Gray" />
-          <FormControlLabel value='brown' control={<Radio />} label="Brown" />
-          <FormControlLabel value='blonde' control={<Radio />} label="Blonde" />
-          <FormControlLabel value='red' control={<Radio />} label="Red" />
-          <FormControlLabel value='black' control={<Radio />} label="Black" />
-          <FormControlLabel value='pink' control={<Radio />} label="Pink" />
+          <FormControlLabel value='Bald' control={<Radio />} label="None" />
+          <FormControlLabel value='GrayShort1' control={<Radio />} label="Gray" />
+          <FormControlLabel value='BrownShort2' control={<Radio />} label="Brown" />
+          <FormControlLabel value='BuzzcutBlonde' control={<Radio />} label="Blonde" />
+          <FormControlLabel value='GingerShort1' control={<Radio />} label="Red" />
+          <FormControlLabel value='GingerLong2' control={<Radio />} label="Red 2" />
+          <FormControlLabel value='BlackShort2' control={<Radio />} label="Black" />
+          <FormControlLabel value='PinkShort1' control={<Radio />} label="Pink" />
         </RadioGroup>
       </FormControl>
       <FormControl component="fieldset" style={{margin: '4px'}}>
@@ -270,21 +286,33 @@ function App() {
       <FormControl component="fieldset" style={{margin: '4px'}}>
         <FormLabel component="legend">Mouth</FormLabel>
         <RadioGroup aria-label="mouth" name="skintone" value={mouth} onChange={(_, val) => setMouth(val)}>
-          <FormControlLabel value='./assets/mouths/NormalLipstickMouth.png' control={<Radio />} label="Red/Bored" />
-          <FormControlLabel value='./assets/mouths/stoic.png' control={<Radio />} label="Black/Bored" />
-          <FormControlLabel value='./assets/mouths/SmirkLipstickMouth.png' control={<Radio />} label="Red/Smirk" />
-          <FormControlLabel value='./assets/mouths/happy.png' control={<Radio />} label="Black/Smirk" />
-          <FormControlLabel value='./assets/mouths/BoredLipstickMouth.png' control={<Radio />} label="Red/Mad" />
-          <FormControlLabel value='./assets/mouths/mad.png' control={<Radio />} label="Black/Mad" />
+          <FormControlLabel value='./assets_two/mouths/NormalMouthLipstick.png' control={<Radio />} label="Red/Bored" />
+          <FormControlLabel value='./assets_two/mouths/NormalMouth.png' control={<Radio />} label="Black/Bored" />
+          <FormControlLabel value='./assets_two/mouths/SmirkMouthLipstick.png' control={<Radio />} label="Red/Smirk" />
+          <FormControlLabel value='./assets_two/mouths/SmirkMouth.png' control={<Radio />} label="Black/Smirk" />
+          <FormControlLabel value='./assets_two/mouths/BoredMouthLipstick.png' control={<Radio />} label="Red/Mad" />
+          <FormControlLabel value='./assets_two/mouths/BoredMouth.png' control={<Radio />} label="Black/Mad" />
         </RadioGroup>
       </FormControl>
       <FormControl component="fieldset" style={{margin: '4px'}}>
         <FormLabel component="legend">Jewelry</FormLabel>
         <RadioGroup aria-label="jewelry" name="jewelry" value={jewelry} onChange={(_, val) => setJewelry(val)}>
-          <FormControlLabel value='./assets/hair/short/bald.png' control={<Radio />} label="None" />
-          <FormControlLabel value='./assets/jewelry/diamond-stud.png' control={<Radio />} label="Diamond Stud" />
-          <FormControlLabel value='./assets/jewelry/gold-stud.png' control={<Radio />} label="Gold Stud" />
-          <FormControlLabel value='./assets/jewelry/gold-chain.png' control={<Radio />} label="Gold Chain" />
+          <FormControlLabel value='./assets_two/jewelry/none.png' control={<Radio />} label="None" />
+          <FormControlLabel value='./assets_two/jewelry/DiamondStud.png' control={<Radio />} label="Diamond Stud" />
+          <FormControlLabel value='./assets_two/jewelry/GoldStud.png' control={<Radio />} label="Gold Stud" />
+          <FormControlLabel value='./assets_two/jewelry/GoldChain.png' control={<Radio />} label="Gold Chain" />
+        </RadioGroup>
+      </FormControl>
+      <FormControl component="fieldset" style={{margin: '4px'}}>
+        <FormLabel component="legend">Eyewear</FormLabel>
+        <RadioGroup aria-label="eyewear" name="eyewear" value={eyewear} onChange={(_, val) => setEyewear(val)}>
+          <FormControlLabel value='./assets_two/hair/short/Bald.png' control={<Radio />} label="None" />
+          <FormControlLabel value='./assets_two/glasses/PurpleSuperheroMask.png' control={<Radio />} label="Hamburglar" />
+          <FormControlLabel value='./assets_two/glasses/BanditMask.png' control={<Radio />} label="Lone Ranger" />
+          <FormControlLabel value='./assets_two/glasses/RedSuperheroMask.png' control={<Radio />} label="Superhero" />
+          <FormControlLabel value='./assets_two/glasses/Web3.png' control={<Radio />} label="Web3" />
+          <FormControlLabel value='./assets_two/glasses/PurpleRain.png' control={<Radio />} label="Purple Rain" />
+          <FormControlLabel value='./assets_two/glasses/TwinPop.png' control={<Radio />} label="Twin Pop" />
         </RadioGroup>
       </FormControl>
       <FormControl component="fieldset" style={{margin: '4px'}}>
@@ -302,9 +330,11 @@ function App() {
       <FormControl component="fieldset" style={{margin: '4px'}}>
         <FormLabel component="legend">Accessories</FormLabel>
         <RadioGroup aria-label="jewelry" name="jewelry" value={accessory} onChange={(_, val) => setAccessory(val)}>
-          <FormControlLabel value='./assets/hair/short/bald.png' control={<Radio />} label="None" />
-          <FormControlLabel value='./assets/accessories/MedicalMask.png' control={<Radio />} label="COVID Mask" />
-          <FormControlLabel value='./assets/accessories/Pipe.png' control={<Radio />} label="Pipe" />
+          <FormControlLabel value='./assets_two/hair/short/Bald.png' control={<Radio />} label="None" />
+          <FormControlLabel value='./assets_two/accessories/MedicalMask.png' control={<Radio />} label="COVID Mask" />
+          <FormControlLabel value='./assets_two/accessories/Pipe.png' control={<Radio />} label="Pipe" />
+          <FormControlLabel value='./assets_two/accessories/Cigarette.png' control={<Radio />} label="Cigarette" />
+          <FormControlLabel value='./assets_two/accessories/Cigarette2.png' control={<Radio />} label="Cigarette Alt" />
         </RadioGroup>
       </FormControl>
       </div>

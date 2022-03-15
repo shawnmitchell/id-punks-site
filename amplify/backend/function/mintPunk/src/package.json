@@ -6,6 +6,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@authenticid-labs/merkle-tree-proof": "^0.0.5",
+    "@aws-sdk/client-s3": "^3.54.0",
     "axios": "^0.26.1",
     "canvas": "^2.9.0",
     "ethers": "^5.5.4",
